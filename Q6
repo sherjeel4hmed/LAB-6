@@ -1,0 +1,79 @@
+#include <iostream>
+using namespace std;
+class Student
+{
+protected:
+    string id;
+    string name;
+
+public:
+    Student(string id, string name) : name(name), id(id) {}
+    void displayStudentInfo()
+    {
+        cout << "Name: " << name << "| " << "ID: " << id << "| " << endl;
+    }
+};
+class Marks : public Student
+{
+protected:
+    int marks_oop, marks_mvc, marks_dld, marks_irs;
+    int total_marks, num_courses;
+    int average_marks;
+
+public:
+    Marks(string id, string name, int courses, int oop, int mvc, int dld, int irs)
+        : Student(id, name), num_courses(courses), marks_oop(oop), marks_mvc(mvc), marks_dld(dld), marks_irs(irs)
+    {
+        total_marks = 0;
+        average_marks = 0;
+    }
+    void displayMarks()
+    {
+        cout << "Marks Obtained: " << endl;
+        cout << "OOP: " << marks_oop << " | MVC: " << marks_mvc
+             << " | DLD: " << marks_dld << " | IRS: " << marks_irs << endl;
+    }
+    int getTotalMarks()
+    {
+        return marks_oop + marks_mvc + marks_dld + marks_irs;
+    }
+
+    int getNumCourses()
+    {
+        return num_courses;
+    }
+};
+
+class Result : public Marks
+{
+private:
+    int total_marks;
+    int average_marks;
+
+public:
+    Result(string id, string name, int courses, int oop, int mvc, int dld, int irs)
+        : Marks(id, name, courses, oop, mvc, dld, irs)
+    {
+        calculateResults();
+    }
+
+    void calculateResults()
+    {
+        total_marks = getTotalMarks();
+        average_marks = total_marks / getNumCourses();
+    }
+
+    void displayResult()
+    {
+        displayStudentInfo();
+        displayMarks();
+        cout << "Total Marks: " << total_marks << " | Average Marks: " << average_marks << endl;
+    }
+};
+int main()
+{
+    Result student1("24k-0724", "Sherjeel Ahmed", 4, 85, 90, 88, 89);
+    student1.displayResult();
+
+    return 0;
+}
