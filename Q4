@@ -1,0 +1,172 @@
+#include <iostream>
+#include <algorithm>
+#include <cctype>
+#include <vector>
+using namespace std;
+class Book
+{
+protected:
+    string genre;
+
+public:
+    Book(string genre) : genre(genre) {}
+    string getgenre()
+    {
+        return genre;
+    }
+    virtual void display()
+    {
+        cout << "Genre: " << genre << endl;
+    }
+    virtual string gettitle() = 0;
+};
+class Novel : public Book
+{
+    string title;
+    string author;
+
+public:
+    Novel(string title, string author, string gen) : Book(gen), title(title), author(author) {}
+    void display()
+    {
+        cout << "Name: " << title << "| " << "Author name: " << author << "| " << "Genre:" << genre << endl;
+    }
+    string gettitle()
+    {
+        return title;
+    }
+};
+
+class Mystery : public Book
+{
+    string title;
+    string author;
+
+public:
+    Mystery(string title, string author, string gen) : Book(gen), title(title), author(author) {}
+    void display()
+    {
+        cout << "Name: " << title << "| " << "Author name: " << author << "| " << "Genre:" << genre << endl;
+    }
+    string gettitle()
+    {
+        return title;
+    }
+};
+class Library
+{
+    vector<Book *> library;
+
+public:
+    string tolowercase(string str)
+    {
+        transform(str.begin(), str.end(), str.begin(), ::tolower);
+        return str;
+    }
+    void addBook()
+    {
+        string genre, title, author;
+        cout << "Enter Genre (Novel/Mystery): ";
+        cin >> genre;
+        cout << "Enter Title: ";
+        cin.ignore();
+        getline(cin, title);
+        cout << "Enter Author: ";
+        getline(cin, author);
+        genre = tolowercase(genre);
+
+        if (genre == "novel")
+        {
+            library.push_back(new Novel(title, author, genre));
+        }
+        else if (genre == "mystery")
+        {
+            library.push_back(new Mystery(title, author, genre));
+        }
+        else
+        {
+            cout << "Invalid genre! Book not added." << endl;
+        }
+    }
+    void displayBooks()
+    {
+        if (library.empty())
+        {
+            cout << "No books in the library." << endl;
+            return;
+        }
+
+        for (int i = 0; i < library.size(); i++)
+        {
+            library[i]->display();
+        }
+    }
+    void searchBook(string name)
+    {
+        bool found = false;
+        name = tolowercase(name);
+
+        for (int i = 0; i < library.size(); i++)
+        {
+            if (tolowercase(library[i]->gettitle()) == name)
+            {
+                cout << "Book Found: ";
+                library[i]->display();
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            cout << "Book not found in the library." << endl;
+        }
+    }
+
+    ~Library()
+    {
+        for (int i = 0; i < library.size(); i++)
+        {
+            delete library[i];
+        }
+    }
+};
+int main()
+{
+    Library library;
+
+    int choice;
+    string searchTitle;
+
+    while (true)
+    {
+        cout << "\nLibrary Menu:\n";
+        cout << "1. Add Book\n";
+        cout << "2. Display All Books\n";
+        cout << "3. Search Book\n";
+        cout << "4. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            library.addBook();
+            break;
+        case 2:
+            library.displayBooks();
+            break;
+        case 3:
+            cout << "Enter book title to search: ";
+            cin >> searchTitle;
+            getline(cin, searchTitle);
+            library.searchBook(searchTitle);
+            break;
+        case 4:
+            cout << "Exiting the program..." << endl;
+            return 0;
+        default:
+            cout << "Invalid choice! Please enter a valid option.\n";
+        }
+    }
+}
