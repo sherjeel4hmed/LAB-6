@@ -1,0 +1,98 @@
+#include <iostream>
+#include<vector>
+using namespace std;
+class MediaFile
+{
+protected:
+    string file_path;
+    int size;
+
+public:
+    MediaFile(string file, double s) : file_path(file), size(s) {}
+    virtual void Play()
+    {
+        cout << "PLaying MediaFile: " << file_path << endl;
+    }
+    virtual void Stop()
+    {
+        cout << " MediaFile Stopped: " << file_path << endl;
+    }
+};
+class VisualMedia : virtual public MediaFile
+{
+protected:
+    string resolution;
+
+public:
+    VisualMedia(string path, int s, string res) : MediaFile(path, s), resolution(res) {}
+};
+class ImageFile : public VisualMedia
+{
+public:
+    ImageFile(string path, int size, string res)
+        : MediaFile(path, size), VisualMedia(path, size, res) {}
+
+    void Play() override
+    {
+        cout << "Displaying image: " << file_path << endl;
+    }
+};
+class AudioMedia : virtual public MediaFile
+{
+protected:
+    int sample_rate;
+
+public:
+    AudioMedia(string path, int s, int sample) : MediaFile(path, s), sample_rate(sample) {}
+    void Play() override {
+        cout<<"Playing audio from: "<<file_path<<endl;
+    }
+};
+class AudioFile : public AudioMedia
+{
+public:
+    AudioFile(string path, int size, int rate)
+        : MediaFile(path, size), AudioMedia(path, size, rate) {}
+
+    void Play() override
+    {
+        cout << "Playing audio: " << file_path << " with " << sample_rate << " Hz sample rate." << endl;
+    }
+};
+class VideoFile : public VisualMedia, AudioMedia
+{
+    public:
+    VideoFile(string path, int size, string res, int rate)
+        : MediaFile(path, size), VisualMedia(path, size, res), AudioMedia(path, size, rate) {}
+        void Play() override {
+            cout << "Playing video: " << file_path << endl;
+        }
+        void AudioPlay(){
+            AudioMedia::Play();
+        }
+        void VisualPlay() {
+            VisualMedia::Play();
+        }
+};
+int main() {
+    vector<MediaFile*> library; 
+
+    library.push_back(new VideoFile("movie.mp4",7,"1280 × 720",40));
+    library.push_back(new ImageFile("photo.jpg",10,"1920 × 1080	"));
+    library.push_back(new AudioFile("song.mp3",6,20));
+
+    cout << "\n--- Playing Media Library ---\n";
+    for (MediaFile* media : library) {
+        media->Play();
+    }
+
+    cout << "\n--- Stopping Media ---\n";
+    for (MediaFile* media : library) {
+        media->Stop();
+    }
+    for (MediaFile* media : library) {
+        delete media;
+    }
+
+    return 0;
+}
