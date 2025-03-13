@@ -1,0 +1,110 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class BankAccount {
+protected:
+    string account_number;
+    double balance;
+    bool isfrozen = false;
+
+public:
+    BankAccount(string acc, double bal) : account_number(acc), balance(bal) {}
+    virtual void deposit(double dep) {
+        if (!isfrozen) balance += dep;
+    }
+    virtual bool withdraw(double with) {
+        if (isfrozen || with > balance) return false;
+        balance -= with;
+        return true;
+    }
+    double getBalance() const { return balance; }
+    void freezeAccount() { isfrozen = true; }
+    void unfreezeAccount() { isfrozen = false; }
+    virtual void display() const {
+        cout << "Account " << account_number << " | Balance: " << balance << endl;
+    }
+    virtual ~BankAccount() {}
+};
+
+class SavingsAccount : public BankAccount {
+    static constexpr double interestRate = 0.05;
+public:
+    SavingsAccount(string accNum, double bal) : BankAccount(accNum, bal) {}
+    void applyInterest() { if (!isfrozen) balance += balance * interestRate; }
+    void display() const override {
+        cout << "SavingsAccount " << account_number << " | Balance: " << balance << " | Interest Rate: " << interestRate << endl;
+    }
+};
+
+class CheckingAccount : public BankAccount {
+    static constexpr double overdraftLimit = 500.0;
+public:
+    CheckingAccount(string accNum, double bal) : BankAccount(accNum, bal) {}
+    bool withdraw(double amount) override {
+        if (isfrozen || balance + overdraftLimit < amount) return false;
+        balance -= amount;
+        if (balance < 0) cout << "Alert: Overdraft used!\n";
+        return true;
+    }
+    void display() const override {
+        cout << "CheckingAccount " << account_number << " | Balance: " << balance << " | Overdraft Limit: " << overdraftLimit << endl;
+    }
+};
+
+class BusinessAccount : public BankAccount {
+    static constexpr double taxRate = 0.02;
+public:
+    BusinessAccount(string accNum, double bal) : BankAccount(accNum, bal) {}
+    void deposit(double amount) override {
+        if (!isfrozen) balance += amount * (1 - taxRate);
+    }
+    void display() const override {
+        cout << "BusinessAccount " << account_number << " | Balance: " << balance << " | Tax Rate: " << taxRate << endl;
+    }
+};
+
+int main() {
+    vector<BankAccount*> accounts;
+    int choice;
+    do {
+        cout << "1. Create Account\n2. Perform Transaction\n3. Display Accounts\n4. Exit\nEnter choice: ";
+        cin >> choice;
+        if (choice == 1) {
+            string accNum;
+            double balance;
+            int type;
+            cout << "Enter account number: "; cin >> accNum;
+            cout << "Enter initial balance: "; cin >> balance;
+            cout << "Choose type (1: Savings, 2: Checking, 3: Business): "; cin >> type;
+            if (type == 1) {
+                accounts.push_back(new SavingsAccount(accNum, balance));
+            } else if (type == 2) {
+                accounts.push_back(new CheckingAccount(accNum, balance));
+            } else if (type == 3) {
+                accounts.push_back(new BusinessAccount(accNum, balance));
+            }
+        } else if (choice == 2) {
+            string accNum, type;
+            double amount;
+            cout << "Enter account number: "; cin >> accNum;
+            cout << "Enter transaction type (deposit/withdraw): "; cin >> type;
+            cout << "Enter amount: "; cin >> amount;
+            for (int i = 0; i < accounts.size(); i++) {
+                if (accounts[i]->getBalance() >= 0) {
+                    if (type == "deposit") accounts[i]->deposit(amount);
+                    else if (type == "withdraw") accounts[i]->withdraw(amount);
+                }
+            }
+        } else if (choice == 3) {
+            for (int i = 0; i < accounts.size(); i++) {
+                accounts[i]->display();
+            }
+        }
+    } while (choice != 4);
+
+    for (int i = 0; i < accounts.size(); i++) {
+        delete accounts[i];
+    }
+    return 0;
+}
