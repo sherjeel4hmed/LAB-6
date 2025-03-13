@@ -1,0 +1,85 @@
+#include <iostream>
+#include <algorithm>
+#include <cctype>
+using namespace std;
+
+class Vehicles
+{
+protected:
+    double price;
+
+public:
+    Vehicles(double price) : price(price) {}
+};
+class Car : public Vehicles
+{
+protected:
+    int seating_capacity;
+    int num_doors;
+    string fuel_type;
+
+public:
+    Car(int s, int d, string f, double price) : Vehicles(price), seating_capacity(s), num_doors(d), fuel_type(f) {}
+};
+class MotorCycle : public Vehicles
+{
+protected:
+    int num_cylinders;
+    int num_gears;
+    int num_wheels;
+
+public:
+    MotorCycle(int c, int g, double price, int w) : Vehicles(price), num_cylinders(c), num_gears(g), num_wheels(w) {}
+};
+class Audi : public Car
+{
+    string Model;
+
+public:
+    Audi(string model, int s, int d, string f, double price) : Car(s, d, f, price), Model(model) {}
+    void display()
+    {
+        cout << "Name: Audi " << "| " << "ModelType: " << Model << "| " << "Price: " << price << "| " << "Seating Capacity: " << seating_capacity << "| "
+             << "Number of Doors: " << num_doors << "| " << "Fuel Type : " << fuel_type << endl;
+    }
+};
+class Yamaha : public MotorCycle
+{
+    string model_type;
+
+public:
+    Yamaha(int c, int g, double price, string type, int w) : MotorCycle(c, g, price, w), model_type(type) {}
+    void display()
+    {
+        cout << "Name: Yamaha " << "| " << "Model Type: " << model_type << "| " << "Price: " << price << "| " << "Number of cylinders: " << num_cylinders << "| "
+             << "Gears: " << num_gears << "| " << "num of wheels: " << num_wheels << endl;
+    }
+};
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    string fuelType;
+    while (true)
+    {
+        cout << "Enter fuel type (Petrol/Diesel): ";
+        cin >> fuelType;
+        transform(fuelType.begin(), fuelType.end(), fuelType.begin(), ::tolower);
+        if (fuelType == "petrol" || fuelType == "diesel")
+        {
+            fuelType[0] = toupper(fuelType[0]);
+            break;
+        }
+
+        cout << "Invalid input! Please enter either 'Petrol' or 'Diesel'." << endl;
+    }
+    Audi a1("A4", 5, 4, fuelType, 50000);
+    Yamaha y1(2, 6, 15000, "Sport", 2);
+    cout << "\nVehicle Details:" << endl;
+    a1.display();
+    y1.display();
+
+    return 0;
+}
